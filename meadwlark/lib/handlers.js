@@ -1,20 +1,21 @@
 const getFortune = require('./fortune')
 
-function home(req, res) {
+function home (req, res) {
   res.render('home')
 }
 
-function about(req, res) {
+function about (req, res) {
   res.render('about', {
     fortune: getFortune()
   })
 }
 
-function notFound(req, res) {
+function notFound (req, res) {
   res.render('404')
 }
 
-function serverError(err, req, res, next) {
+// eslint-disable-next-line node/handle-callback-err
+function serverError (err, req, res, next) {
   res.render('500')
 }
 

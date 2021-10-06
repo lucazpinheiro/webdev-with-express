@@ -8,7 +8,6 @@ it('should render home page', () => {
   expect(res.render.mock.calls[0][0]).toBe('home')
 })
 
-
 it('shoould render about page with fortune', () => {
   const req = {}
   const res = { render: jest.fn() }
@@ -24,10 +23,9 @@ it('shoould render about page with fortune', () => {
   // check if first call of render function had a object with a fortune property as second argument
   expect(res.render.mock.calls[0][1])
     .toEqual(expect.objectContaining({
-      fortune: expect.stringMatching(/\W/),
+      fortune: expect.stringMatching(/\W/)
     }))
 })
-
 
 it('404 handler renders', () => {
   const req = {}
