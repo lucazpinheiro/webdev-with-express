@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const handlers = require('./lib/handlers')
+const { application } = require('express')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -19,6 +20,13 @@ app.use(express.static(path.join(__dirname, '/public')))
 // routes
 app.get('/', handlers.home)
 app.get('/about', handlers.about)
+
+// exemplo de headers que são enviados na requisição para o servidor
+// app.get('/headers', (req, res) => {
+//   res.type('text/plain')
+//   const headers = Object.entries(req.headers).map(([key, value]) => `${key}: ${value}`)
+//   res.send(headers.join('\n'))
+// })
 
 // custom 404 page
 app.use(handlers.notFound)
