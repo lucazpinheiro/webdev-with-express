@@ -1,8 +1,9 @@
 const path = require('path')
 const express = require('express')
+const bodyParser = require('body-parser')
 const expressHandlebars = require('express-handlebars')
 const handlers = require('./lib/handlers')
-const { application } = require('express')
+const middleware = require('./lib/middleware')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -17,8 +18,11 @@ app.set('view engine', 'handlebars')
 
 app.use(express.static(path.join(__dirname, '/public')))
 
+// set bodyParser middleware
+app.use(bodyParser.urlencoded({ extended: false }))
+
 // routes
-app.get('/', handlers.home)
+app.get('/', middleware.weatherMiddleware, handlers.home)
 app.get('/about', handlers.about)
 
 // exemplo de headers que são enviados na requisição para o servidor
