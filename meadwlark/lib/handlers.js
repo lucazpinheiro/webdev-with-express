@@ -35,7 +35,7 @@ function newsletterSignupThankYou(req, res) {
   res.render('newsletter-signup-thank-you')
 }
 
-function newsletter (req, res) {
+function newsletter(req, res) {
   // we will learn about CSRF later...for now, we just
   // provide a dummy value
   res.render('newsletter', { csrf: 'CSRF token goes here' })
@@ -77,7 +77,36 @@ function vacationPhotoContestProcess(req, res, fields, files) {
   res.redirect(303, 'contest/vacation-photo-thank-you')
 }
 
+// cookie handlers
+function cookieSender(req, res) {
+  const monster = req.cookies.monster
+  const signedMonster = req.signedCookies.signed_monster
+  console.log(`cookies monster -> ${monster}`)
+  console.log(`cookies signed monster -> ${signedMonster}`)
 
+  res.cookie('monster', 'nom nom')
+  res.cookie('signed_monster', 'nom nom', { signed: true })
+  res.render('cookies')
+}
+
+// session handler
+function sessionDemo(req, res) {
+  req.session.userName = 'Anonymous'
+  const colorScheme = req.session.colorScheme || 'dark'
+}
+
+function flashMessageDemoForm(req, res) {
+  res.render('flash-demo')
+}
+
+function flashMessageDemoRes(req, res) {
+  req.session.flash = {
+    type: 'danger',
+    intro: 'Validation error!',
+    message: 'Just to show off.'
+  }
+  return res.redirect(303, '/flash-messages')
+}
 
 module.exports = {
   home,
@@ -91,5 +120,8 @@ module.exports = {
   api: api,
   vacationPhotoContest,
   vacationPhotoContestProcess,
-  vacationPhotoContestFetch
+  vacationPhotoContestFetch,
+  cookieSender,
+  flashMessageDemoForm,
+  flashMessageDemoRes
 }

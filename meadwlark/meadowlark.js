@@ -1,6 +1,8 @@
 const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const expressSession = require('express-session')
 const multiparty = require('multiparty')
 const expressHandlebars = require('express-handlebars')
 const handlers = require('./lib/handlers')
@@ -8,6 +10,7 @@ const middleware = require('./lib/middleware')
 
 const app = express()
 const port = process.env.PORT || 3000
+const { credentials } = require('./config')
 
 // configure Handlebars view engine
 app.engine('handlebars', expressHandlebars({
@@ -24,6 +27,19 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 // set bodyParser to parse json bodies
 app.use(bodyParser.json())
+
+// set cookieParser middleware
+app.use(cookieParser(credentials.cookieSecret))
+
+// set sessions middleware
+app.use(expressSession({
+  resave: false,
+  saveUninitialized: false,
+  secret: credentials.cookieSecret
+}))
+
+// set custom flash middleware
+app.use(middleware.flash)
 
 // routes
 app.get('/', middleware.weatherMiddleware, handlers.home)
@@ -56,9 +72,19 @@ app.post('/contest/vacation-photo/:year/:month', (req, res) => {
   })
 })
 
-//upload de arquivos com fetch
+// upload de arquivos com fetch
 app.get('/contest/vacation-photo-fetch', handlers.vacationPhotoContestFetch)
 app.post('/api/vacation-photo-contest-fetch', handlers.api.vacationPhotoContestFetch)
+
+// cookie testing route
+app.get('/cookies', handlers.cookieSender)
+
+// session and flash messages route
+app.get('/flash-demo', handlers.flashMessageDemoForm)
+app.post('/flash-messages', handlers.flashMessageDemoRes)
+app.get('/flash-messages', (req, res) => {
+  res.render('flash-messages')
+})
 
 // custom 404 page
 app.use(handlers.notFound)
