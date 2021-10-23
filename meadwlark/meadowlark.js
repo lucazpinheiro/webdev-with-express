@@ -1,9 +1,11 @@
 const path = require('path')
+const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const expressSession = require('express-session')
 const multiparty = require('multiparty')
+const morgan = require('morgan')
 const expressHandlebars = require('express-handlebars')
 const handlers = require('./lib/handlers')
 const middleware = require('./lib/middleware')
@@ -11,6 +13,16 @@ const middleware = require('./lib/middleware')
 const app = express()
 const port = process.env.PORT || 3000
 const { credentials } = require('./config')
+
+switch (app.get('env')) {
+  case 'development':
+    app.use(morgan('dev'))
+    break
+  case 'production':
+    const stream = fs.createWriteStream('./var/log' + '/access.log', { flags: 'a' })
+    app.use(morgan('combined', { stream }))
+    break
+}
 
 // configure Handlebars view engine
 app.engine('handlebars', expressHandlebars({
@@ -64,6 +76,16 @@ app.post('/api/newsletter-signup', handlers.api.newsletterSignup)
 // upload de arquivos
 app.get('/contest/vacation-photo', handlers.vacationPhotoContest)
 
+app.get('/fail', (req, res) => {
+  throw new Error('Nope')
+})
+
+app.get('/epic-fail', (req, res) => {
+  process.nextTick(() => {
+    throw new Error('Nope')
+  })
+})
+
 app.post('/contest/vacation-photo/:year/:month', (req, res) => {
   const form = new multiparty.Form()
   form.parse(req, (err, fields, files) => {
@@ -94,6 +116,7 @@ app.use(handlers.serverError)
 
 if (require.main === module) {
   app.listen(port, () => {
+    console.log(app.get('env'))
     console.log(`Express started on http://localhost:${port}; press Ctrl-C to terminate.`)
   })
 } else {
