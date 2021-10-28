@@ -1,3 +1,6 @@
+// const { pathUtils } = require('path')
+// const fs = require('fs')
+const db = require('../db')
 const getFortune = require('./fortune')
 
 function home(req, res) {
@@ -108,6 +111,53 @@ function flashMessageDemoRes(req, res) {
   return res.redirect(303, '/flash-messages')
 }
 
+// const dataDir = pathUtils.resolve(__dirname, '..', 'data')
+// const vacationPhotosDir = pathUtils.join(dataDir, 'vacation-photos')
+// if (!fs.existsSync(dataDir)) {
+//   fs.mkdirSync(dataDir)
+// }
+// if (!fs.existsSync(vacationPhotosDir)) {
+//   fs.mkdirSync(vacationPhotosDir)
+// }
+
+// function saveContestEntry(contestName, email, year, month, photoPath) {
+//   // TODO...this will come later
+// }
+
+// api.vacationPhotoContest = async (req, res, fields, files) => {
+//   const photo = files.photo[0]
+//   const dir = vacationPhotosDir + '/' + Date.now()
+//   const path = dir + '/' + photo.originalFilename
+//   await fs.mkdir(dir)
+//   await fs.rename(photo.path, path)
+//   saveContestEntry('vacation-photo', fields.email, req.params.year, req.params.month, path)
+//   res.send({ result: 'success' })
+// }
+
+async function listVacations(req, res) {
+  const vacations = await db.getVacations({ available: true })
+  const context = {
+    vacations: vacations.map(vacation => ({
+      sku: vacation.sku,
+      name: vacation.name,
+      description: vacation.description,
+      price: '$' + vacation.price.toFixed(2),
+      inSeason: vacation.inSeason
+    }))
+  }
+  res.render('vacation', context)
+}
+
+function notifyWhenInSeasonForm (req, res) {
+  res.render('notify-me-when-in-season', { sku: req.query.sku })
+}
+
+async function notifyWhenInSeasonProcess (req, res) {
+  const { email, sku } = req.body
+  await db.addVacationInSeasonListener(email, sku)
+  return res.redirect(303, '/vacations')
+}
+
 module.exports = {
   home,
   about,
@@ -123,5 +173,8 @@ module.exports = {
   vacationPhotoContestFetch,
   cookieSender,
   flashMessageDemoForm,
-  flashMessageDemoRes
+  flashMessageDemoRes,
+  listVacations,
+  notifyWhenInSeasonForm,
+  notifyWhenInSeasonProcess
 }

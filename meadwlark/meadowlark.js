@@ -9,6 +9,7 @@ const morgan = require('morgan')
 const expressHandlebars = require('express-handlebars')
 const handlers = require('./lib/handlers')
 const middleware = require('./lib/middleware')
+require('./db')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -100,6 +101,11 @@ app.post('/api/vacation-photo-contest-fetch', handlers.api.vacationPhotoContestF
 
 // cookie testing route
 app.get('/cookies', handlers.cookieSender)
+
+// vacations
+app.get('/vacations', handlers.listVacations)
+app.get('/notify-me-when-in-season', handlers.notifyWhenInSeasonForm)
+app.post('/notify-me-when-in-season', handlers.notifyWhenInSeasonProcess)
 
 // session and flash messages route
 app.get('/flash-demo', handlers.flashMessageDemoForm)
