@@ -12,6 +12,8 @@ const middleware = require('./lib/middleware')
 require('./db')
 
 const app = express()
+require('./routes')(app)
+
 const port = process.env.PORT || 3000
 const { credentials } = require('./config')
 
@@ -55,9 +57,6 @@ app.use(expressSession({
 app.use(middleware.flash)
 
 // routes
-app.get('/', middleware.weatherMiddleware, handlers.home)
-app.get('/about', handlers.about)
-
 // exemplo de headers que são enviados na requisição para o servidor
 // app.get('/headers', (req, res) => {
 //   res.type('text/plain')

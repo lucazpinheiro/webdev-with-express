@@ -1,17 +1,6 @@
 // const { pathUtils } = require('path')
 // const fs = require('fs')
 const db = require('../db')
-const getFortune = require('./fortune')
-
-function home(req, res) {
-  res.render('home')
-}
-
-function about(req, res) {
-  res.render('about', {
-    fortune: getFortune()
-  })
-}
 
 function notFound(req, res) {
   res.render('404')
@@ -159,8 +148,6 @@ async function notifyWhenInSeasonProcess (req, res) {
 }
 
 module.exports = {
-  home,
-  about,
   notFound,
   serverError,
   newsletterSignup,
